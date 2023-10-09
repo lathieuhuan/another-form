@@ -1,16 +1,28 @@
 import { FormValues } from "./form";
 import { Path } from "./path";
 
-type ValidateRule<TFormValues extends FormValues, ValueType> =
+export type FieldError = string;
+
+type Rule<ValueType> =
   | ValueType
   | {
-      value: ValueType | ((values: TFormValues) => ValueType);
+      value: ValueType;
       message: string;
     };
 
-type ValidateRules<TFormValues extends FormValues> = {
+type ValidateRule<TFormValues extends FormValues, ValueType> =
+  | Rule<ValueType>
+  | ((values: TFormValues) => Rule<ValueType>);
+
+export type ValidateRules<TFormValues extends FormValues> = {
   required?: ValidateRule<TFormValues, boolean>;
-  validate?: (value: TFormValues) => boolean;
+  validate?: (value: unknown, values: TFormValues) => boolean;
 };
+
+// export type ValidateRule<TFormValues extends FormValues> = {
+//   required?: boolean | ((values: TFormValues) => boolean);
+//   validator?: (value: any, values: TFormValues) => boolean;
+//   message?: string;
+// };
 
 export type FormRules<TFormValues extends FormValues> = Partial<Record<Path<TFormValues>, ValidateRules<TFormValues>>>;

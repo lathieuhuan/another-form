@@ -11,17 +11,21 @@ interface FormProps<TFormValues extends FormValues> {
   onSubmit?: (values: TFormValues) => void;
 }
 
-export function Form<TFormValues extends FormValues = FormValues>(props: FormProps<TFormValues>) {
-  const formCenter = useForm<TFormValues>({ form: props.form });
+export function Form<TFormValues extends FormValues = FormValues>({
+  form,
+  onSubmit,
+  ...formProps
+}: FormProps<TFormValues>) {
+  const formCenter = useForm<TFormValues>({ form });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    props.onSubmit?.(formCenter.getValue());
+    onSubmit?.(formCenter.getValue());
   };
 
   return (
     <FormCenterProvider formCenter={formCenter}>
-      <form {...props} onSubmit={handleSubmit} />
+      <form {...formProps} onSubmit={handleSubmit} />
     </FormCenterProvider>
   );
 }

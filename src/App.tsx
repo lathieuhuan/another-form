@@ -1,30 +1,41 @@
 import { Form, FormItem } from "./components";
 import { useForm } from "./hooks";
-import { CustomController, MyFormData, UseWatchTest } from "./features";
+import { Input, MyFormData, InputNumber } from "./features";
 
 type FieldProps = {
   label: string;
+  description?: string;
+  errors?: string[];
   children: React.ReactNode;
 };
 const Field = (props: FieldProps) => {
   return (
-    <div className="flex flex-col">
+    <div className="col">
       <label>{props.label}</label>
+      {props.description ? <span>{props.description}</span> : null}
       {props.children}
+      <div>
+        {props.errors?.map((error, i) => (
+          <p key={i}>{error}</p>
+        ))}
+      </div>
     </div>
   );
 };
 
 function App() {
   const form = useForm<MyFormData>({
-    defaultValues: {
-      primitive: "",
-      nested: {
-        value: "",
-      },
-      object: {
-        key: "",
-      },
+    // defaultValues: {
+    //   primitive: "",
+    //   nested: {
+    //     value: "",
+    //   },
+    //   object: {
+    //     key: "",
+    //   },
+    // },
+    dependants: {
+      quantity: ["required4"],
     },
     rules: {
       required1: {
@@ -37,59 +48,80 @@ function App() {
         },
       },
       required3: {
-        required: {
-          value: () => true,
-          message: "This is dynamic required",
-        },
+        required: ({ quantity }) => quantity < 50,
+      },
+      required4: {
+        required: ({ quantity }) => ({
+          value: quantity > 100,
+          message: `This is dynamic required when quantity (${quantity}) > 100`,
+        }),
       },
     },
   });
 
+  console.log("app render");
+
   const handleClick = () => {
-    form.setValue("object", { key: "DEV" });
+    console.log(form.setValue("quantity", 160, { triggerDependants: "force" }));
+    // form.setValue("object", { key: "DEV" });
   };
 
   return (
     <Form
       form={form}
+      className="col"
       onSubmit={(values) => {
         console.log(values);
       }}
     >
-      <FormItem form={form} name="primitive">
-        {({ control }) => {
+      <FormItem form={form} name="quantity">
+        {(control) => {
           return (
-            <Field label="Code">
-              <input {...control} />
+            <Field label="Quantity">
+              <InputNumber {...control} />
             </Field>
           );
         }}
       </FormItem>
-      <UseWatchTest path="primitive" />
 
-      <FormItem form={form} name="nested.value">
-        {({ control }) => {
+      <FormItem form={form} name="required1">
+        {(control, state) => {
           return (
-            <Field label="Nested Value">
-              <input {...control} />
+            <Field label="Required 1" {...state}>
+              <Input {...control} />
             </Field>
           );
         }}
       </FormItem>
-      <UseWatchTest path="nested.value" />
-
-      <FormItem form={form} name="object">
-        {({ control }) => {
+      <FormItem form={form} name="required2">
+        {(control, state) => {
           return (
-            <Field label="Custom controler">
-              <CustomController {...control} />
+            <Field label="Required 2" {...state}>
+              <Input {...control} />
             </Field>
           );
         }}
       </FormItem>
-      <UseWatchTest path="object" />
+      <FormItem form={form} name="required3">
+        {(control, state) => {
+          return (
+            <Field label="Required 3" description="This is required when quantity < 50" {...state}>
+              <Input {...control} />
+            </Field>
+          );
+        }}
+      </FormItem>
+      <FormItem form={form} name="required4">
+        {(control, state) => {
+          return (
+            <Field label="Required 4" {...state}>
+              <Input {...control} />
+            </Field>
+          );
+        }}
+      </FormItem>
 
-      <div>
+      <div className="row">
         <button type="button" onClick={handleClick}>
           Click
         </button>

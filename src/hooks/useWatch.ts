@@ -10,6 +10,6 @@ export function useWatch<
 >(formCenter: FormCenter<TFormValues>, path: TPath) {
   return useSyncExternalStore(
     (subscriber) => (formCenter as FormCenterService<TFormValues>)._watchValue(path, subscriber),
-    () => formCenter.getValue<TPath>(path)
+    () => formCenter.getValue(path)
   );
 }

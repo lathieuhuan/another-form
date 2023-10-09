@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
 import { FormCenter, FormCenterService } from "../form-center";
-import { FormValues, FormRules, DeepPartial } from "../types";
+import { FormValues, FormRules, DeepPartial, FormDependants } from "../types";
 
 interface UseFormArgs<TFormValues extends FormValues> {
   form?: FormCenter<TFormValues>;
   defaultValues?: DeepPartial<TFormValues>;
   rules?: FormRules<TFormValues>;
+  dependants?: FormDependants<TFormValues>;
 }
 
 export function useForm<TFormValues extends FormValues = FormValues>(args?: UseFormArgs<TFormValues>) {
@@ -16,10 +17,10 @@ export function useForm<TFormValues extends FormValues = FormValues>(args?: UseF
   }
 
   useEffect(() => {
-    if (args?.rules) {
-      const form = formCenter.current as FormCenterService<TFormValues>;
-      form.updateFormRules(args?.rules);
-    }
+    const form = formCenter.current as FormCenterService<TFormValues>;
+
+    args?.rules && form.updateFormRules(args.rules);
+    args?.dependants && form.updateFormDependencies(args.dependants);
   }, []);
 
   return formCenter.current;
