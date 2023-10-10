@@ -1,7 +1,10 @@
-import { FormValues, Path, PathValue, DeepPartial, FieldError } from "../types";
+import { FormValues, Path, PathValue, DeepPartial, FieldError, FormRules, FormDependants, FormState } from "../types";
 
 export type FormCenterConstructOptions<TFormValues extends FormValues> = {
+  initialState?: Partial<FormState>;
   defaultValues?: DeepPartial<TFormValues>;
+  rules?: FormRules<TFormValues>;
+  dependants?: FormDependants<TFormValues>;
 };
 
 export type ValueWatcher<TFormValues extends FormValues> = <TPath extends Path<TFormValues> = Path<TFormValues>>(
@@ -12,6 +15,9 @@ export type FieldState<TFormValues extends FormValues, TPath extends Path<TFormV
   value: PathValue<TFormValues, TPath>;
   errors?: FieldError[];
   isTouched: boolean;
+  isValid: boolean;
+  isDisabled: boolean;
+  isRequired: boolean;
 };
 
 export type FieldWatcher<TFormValues extends FormValues, TPath extends Path<TFormValues> = Path<TFormValues>> = (

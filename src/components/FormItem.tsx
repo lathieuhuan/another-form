@@ -1,9 +1,14 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { FieldState, FormCenter, FormCenterService } from "../form-center";
 import { useFormCenter } from "../hooks";
-import { FieldError, FormValues, Path, PathValue } from "../types";
+import { FormValues, Path, PathValue } from "../types";
 
-interface IFormItemProps<TFormValues extends FormValues, TPath extends Path<TFormValues>> {
+type LocalFieldState<TFormValues extends FormValues, TPath extends Path<TFormValues>> = Pick<
+  FieldState<TFormValues, TPath>,
+  "value" | "errors" | "isRequired" | "isDisabled"
+>;
+
+type FormItemProps<TFormValues extends FormValues, TPath extends Path<TFormValues>> = {
   form?: FormCenter<TFormValues>;
   name: TPath;
   children: (
@@ -12,33 +17,32 @@ interface IFormItemProps<TFormValues extends FormValues, TPath extends Path<TFor
       onChange: (...e: any[]) => void;
       onBlur: () => void;
     },
-    state: {
-      errors?: FieldError[];
-    }
+    state: Omit<LocalFieldState<TFormValues, TPath>, "value">
   ) => React.ReactElement | null;
-}
+};
 
-type LocalFieldState<TFormValues extends FormValues, TPath extends Path<TFormValues>> = Pick<
-  FieldState<TFormValues, TPath>,
-  "value" | "errors"
->;
+const sanitizeState = <TFormValues extends FormValues, TPath extends Path<TFormValues>>(
+  state: LocalFieldState<TFormValues, TPath>
+): LocalFieldState<TFormValues, TPath> => {
+  return {
+    value: state.value,
+    errors: state.errors,
+    isRequired: state.isRequired,
+    isDisabled: state.isDisabled,
+  };
+};
 
 export function FormItem<
   TFormValues extends FormValues = FormValues,
   TPath extends Path<TFormValues> = Path<TFormValues>
->({ form, name, children }: IFormItemProps<TFormValues, TPath>) {
+>({ form, name, children }: FormItemProps<TFormValues, TPath>) {
   const formCenter = useFormCenter(form) as FormCenterService<TFormValues>;
-  const [fieldState, setFieldState] = useState<LocalFieldState<TFormValues, TPath>>({
-    value: formCenter.getFieldState(name).value,
-  });
+  const [fieldState, setFieldState] = useState(() => sanitizeState(formCenter._getInitialFieldState(name)));
 
   useEffect(() => {
-    return formCenter._watchField(name, (newState) =>
-      setFieldState((oldState) => {
-        const { value, errors } = { ...oldState, ...newState };
-        return { value, errors };
-      })
-    );
+    return formCenter._registerField(name, (newState) => {
+      setFieldState((oldState) => sanitizeState(Object.assign(oldState, newState)));
+    });
   }, [name]);
 
   const handleChange = (...e: any[]) => {
@@ -51,12 +55,13 @@ export function FormItem<
       newValue = value;
     }
 
+    formCenter.setFieldTouched(name, true);
     formCenter.setValue(name, newValue === "" ? undefined : newValue, { triggerDependants: true });
     formCenter.validate(name);
   };
 
   const handleBlur = () => {
-    formCenter.updateTouched(name, true);
+    // formCenter.setTouchedField(name, true);
   };
 
   return children(
@@ -67,6 +72,8 @@ export function FormItem<
     },
     {
       errors: fieldState.errors,
+      isDisabled: fieldState.isDisabled,
+      isRequired: fieldState.isRequired,
     }
   );
 }

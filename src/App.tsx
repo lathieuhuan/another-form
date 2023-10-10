@@ -1,17 +1,30 @@
 import { Form, FormItem } from "./components";
-import { useForm } from "./hooks";
-import { Input, MyFormData, InputNumber } from "./features";
+import { useForm, useFormState } from "./hooks";
+import { MyFormData, InputNumber, Input } from "./features";
 
 type FieldProps = {
   label: string;
   description?: string;
   errors?: string[];
+  isRequired?: boolean;
   children: React.ReactNode;
 };
 const Field = (props: FieldProps) => {
   return (
     <div className="col">
-      <label>{props.label}</label>
+      <label>
+        {props.isRequired ? (
+          <span
+            style={{
+              marginLeft: 2,
+              color: "red",
+            }}
+          >
+            *
+          </span>
+        ) : null}
+        {props.label}
+      </label>
       {props.description ? <span>{props.description}</span> : null}
       {props.children}
       <div>
@@ -25,19 +38,23 @@ const Field = (props: FieldProps) => {
 
 function App() {
   const form = useForm<MyFormData>({
-    // defaultValues: {
-    //   primitive: "",
-    //   nested: {
-    //     value: "",
-    //   },
-    //   object: {
-    //     key: "",
-    //   },
-    // },
+    defaultValues: {
+      quantity: 10,
+      // primitive: "",
+      // nested: {
+      //   value: "",
+      // },
+      // object: {
+      //   key: "",
+      // },
+    },
     dependants: {
-      quantity: ["required4"],
+      quantity: ["required3", "required4"],
     },
     rules: {
+      // quantity: {
+      //   required: true,
+      // },
       required1: {
         required: true,
       },
@@ -52,17 +69,19 @@ function App() {
       },
       required4: {
         required: ({ quantity }) => ({
-          value: quantity > 100,
-          message: `This is dynamic required when quantity (${quantity}) > 100`,
+          value: quantity > 50,
+          message: `This is dynamic required when quantity (${quantity}) > 50`,
         }),
       },
     },
   });
 
+  const state = useFormState("isValid", form);
+
   console.log("app render");
 
   const handleClick = () => {
-    console.log(form.setValue("quantity", 160, { triggerDependants: "force" }));
+    form.setValue("quantity", 160, { triggerDependants: "force" });
     // form.setValue("object", { key: "DEV" });
   };
 
@@ -75,9 +94,9 @@ function App() {
       }}
     >
       <FormItem form={form} name="quantity">
-        {(control) => {
+        {(control, state) => {
           return (
-            <Field label="Quantity">
+            <Field label="Quantity" {...state}>
               <InputNumber {...control} />
             </Field>
           );
@@ -125,7 +144,9 @@ function App() {
         <button type="button" onClick={handleClick}>
           Click
         </button>
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={!state}>
+          Submit
+        </button>
       </div>
     </Form>
   );

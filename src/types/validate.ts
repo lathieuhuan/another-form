@@ -10,7 +10,7 @@ type Rule<ValueType> =
       message: string;
     };
 
-type ValidateRule<TFormValues extends FormValues, ValueType> =
+export type ValidateRule<TFormValues extends FormValues, ValueType> =
   | Rule<ValueType>
   | ((values: TFormValues) => Rule<ValueType>);
 

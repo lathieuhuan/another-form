@@ -1,55 +1,117 @@
-import { FormDependants, FormErrors, FormRules, FormValues, Path, TouchedFields } from "../types";
+import {
+  FormDependants,
+  FormErrors,
+  FormRules,
+  FormState,
+  FormValues,
+  Path,
+  TouchedFields,
+  ValidFields,
+} from "../types";
 import get from "../utils/get";
 import set from "../utils/set";
 import cloneObject from "../utils/cloneObject";
 import { FieldWatcher, FormCenterConstructOptions, InternalFormCenter, ValueWatcher } from "./types";
-import { validateField } from "./validate-field";
+import { isFieldRequired, validateField } from "./validate-field";
+import isNullOrUndefined from "../utils/isNullOrUndefined";
+import isUndefined from "../utils/isUndefined";
 
 export class FormCenterService<TFormValues extends FormValues = FormValues> {
   config = {
-    singleError: true,
+    multiErrors: false,
+  };
+  state: FormState = {
+    isTouched: false,
+    isValid: false,
   };
 
+  validTimeoutId: number | undefined;
+  timeoutUpdateStateValid = 200;
+
+  fieldPaths: Set<Path<TFormValues>> = new Set();
+
   values = {} as TFormValues;
-  dependants: FormDependants<TFormValues> = {};
+  dependants: FormDependants<TFormValues>;
+  rules: FormRules<TFormValues>;
   errors: FormErrors<TFormValues> = {};
-  rules: FormRules<TFormValues> = {};
   touchedFields: TouchedFields<TFormValues> = {};
+  validFields: ValidFields<TFormValues> = {};
+  disabledFields = {};
 
   valueWatchers: Map<Path<TFormValues>, Set<ValueWatcher<TFormValues>>> = new Map();
   fieldWatchers: Map<Path<TFormValues>, Set<FieldWatcher<TFormValues>>> = new Map();
+  formStateWatchers: Set<(formState: FormState) => void> = new Set();
 
-  constructor({ defaultValues }: FormCenterConstructOptions<TFormValues>) {
-    if (defaultValues) {
-      this.values = cloneObject(defaultValues) as TFormValues;
-    }
+  constructor(args: FormCenterConstructOptions<TFormValues> = {}) {
+    const { defaultValues = {}, dependants = {}, rules = {}, initialState = {} } = cloneObject(args);
+
+    this.state = Object.assign(this.state, initialState);
+    this.values = defaultValues as TFormValues;
+    this.dependants = dependants;
+    this.rules = rules;
   }
+
+  // ========== FORM ==========
+
+  _getFormState = <TKey extends keyof FormState>(key?: TKey): FormState | FormState[TKey] => {
+    return key ? this.state[key] : this.state;
+  };
+
+  _watchFormState = (watcher: (formState: FormState) => void) => {
+    this.formStateWatchers.add(watcher);
+    return () => {
+      this.formStateWatchers.delete(watcher);
+    };
+  };
 
   updateFormRules = (newRules: typeof this.rules) => {
     this.rules = newRules;
   };
 
-  updateFormDependencies = (newDependencies: typeof this.dependants) => {
+  updateFormDependants = (newDependencies: typeof this.dependants) => {
     this.dependants = newDependencies;
   };
 
-  _watchValue = (path: Path<TFormValues>, watcher: ValueWatcher<TFormValues>): (() => void) => {
-    const valueWatchers = this.valueWatchers.get(path);
+  _updateFormState = (newState: Partial<FormState>) => {
+    this.state = {
+      ...this.state,
+      ...newState,
+    };
+    this.formStateWatchers.forEach((watcher) => watcher(this.state));
+  };
 
-    if (valueWatchers) {
-      valueWatchers.add(watcher);
-      return () => {
-        valueWatchers.delete(watcher);
-      };
-    }
+  _checkFormValid = () => {
+    const isValid = Object.values(this.validFields).every(Boolean);
 
-    this.valueWatchers.set(path, new Set([watcher]));
-    return () => {
-      this.valueWatchers.get(path)?.delete(watcher);
+    this._updateFormState({
+      isValid,
+    });
+  };
+
+  // ========== FIELD ==========
+
+  getFieldState: InternalFormCenter<TFormValues>["getFieldState"] = (path) => {
+    const value = get(this.values, path);
+    const isRequired = isFieldRequired(this.rules[path]?.required, this.values) !== false;
+
+    return {
+      value,
+      errors: this.errors[path],
+      isRequired,
+      isTouched: this.touchedFields[path] ?? false,
+      isDisabled: false,
+      isValid: false,
     };
   };
 
-  _watchField = <TPath extends Path<TFormValues>>(
+  _getInitialFieldState: typeof this.getFieldState = (path) => {
+    const initialFieldState = this.getFieldState(path);
+    const initialValid = !initialFieldState.isRequired || !isNullOrUndefined(initialFieldState.value);
+    this._setFieldValid(path, initialValid);
+    return initialFieldState;
+  };
+
+  _registerField = <TPath extends Path<TFormValues>>(
     path: TPath,
     watcher: FieldWatcher<TFormValues, TPath>
   ): (() => void) => {
@@ -72,16 +134,6 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
     return path ? get(this.values, path) : this.values;
   };
 
-  getFieldState: InternalFormCenter<TFormValues>["getFieldState"] = (path) => {
-    const value = get(this.values);
-    return {
-      value,
-      errors: this.errors[path],
-      isTouched: this.touchedFields[path] ?? false,
-    };
-  };
-
-  // #to-do: implement third argument options
   setValue: InternalFormCenter<TFormValues>["setValue"] = (path, value, options = {}) => {
     set(this.values, path, value);
 
@@ -108,6 +160,7 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
       }
     }
 
+    // need to update dependants valid even triggerDependants false, but no emit errors
     const { triggerDependants } = options;
 
     if (triggerDependants) {
@@ -117,21 +170,47 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
     }
   };
 
-  updateTouched = (path: Path<TFormValues>, touched: boolean) => {
-    this.touchedFields[path] = touched;
-  };
-
   validate: InternalFormCenter<TFormValues>["validate"] = (path) => {
     const rules = this.rules[path];
-    const errors = rules ? validateField(rules, get(this.values, path), this.values) : [];
+    const validateResult = rules ? validateField(rules, get(this.values, path), this.values) : undefined;
 
-    this.errors[path] = errors.length ? errors : undefined;
+    this.errors[path] = validateResult?.errors.length ? validateResult.errors : undefined;
+    const errors = this.errors[path];
 
     this.fieldWatchers.get(path)?.forEach((watcher) =>
       watcher({
-        errors: this.errors[path],
+        errors,
+        isRequired: validateResult?.isRequired === true,
       })
     );
-    return this.errors[path] ? this.errors[path]! : true;
+    this._setFieldValid(path, isUndefined(errors));
+
+    return this.errors[path] ?? true;
+  };
+
+  _setFieldValid = (path: Path<TFormValues>, isValid: boolean) => {
+    this.validFields[path] = isValid;
+    clearTimeout(this.validTimeoutId);
+    this.validTimeoutId = setTimeout(this._checkFormValid, this.timeoutUpdateStateValid);
+  };
+
+  setFieldTouched = (path: Path<TFormValues>, touched: boolean) => {
+    this.touchedFields[path] = touched;
+  };
+
+  _watchValue = (path: Path<TFormValues>, watcher: ValueWatcher<TFormValues>): (() => void) => {
+    const valueWatchers = this.valueWatchers.get(path);
+
+    if (valueWatchers) {
+      valueWatchers.add(watcher);
+      return () => {
+        valueWatchers.delete(watcher);
+      };
+    }
+
+    this.valueWatchers.set(path, new Set([watcher]));
+    return () => {
+      this.valueWatchers.get(path)?.delete(watcher);
+    };
   };
 }
