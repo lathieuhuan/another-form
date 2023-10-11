@@ -1,9 +1,21 @@
-import { FormValues, Path, PathValue, DeepPartial, FieldError, FormRules, FormDependants, FormState } from "../types";
+import {
+  FormValues,
+  Path,
+  PathValue,
+  DeepPartial,
+  FieldError,
+  FormRules,
+  FormDependants,
+  FormState,
+  FormConfig,
+} from "../types";
 
 export type FormCenterConstructOptions<TFormValues extends FormValues> = {
+  config?: FormConfig;
   initialState?: Partial<FormState>;
   defaultValues?: DeepPartial<TFormValues>;
   rules?: FormRules<TFormValues>;
+  /** When a field change, validate its dependants */
   dependants?: FormDependants<TFormValues>;
 };
 
@@ -34,8 +46,14 @@ type GetFieldState<TFormValues extends FormValues = FormValues> = <TPath extends
 ) => FieldState<TFormValues, TPath>;
 
 type SetValueOptions = {
-  /** Validate dependants if they're touched, use 'force' to bypass touched check */
-  triggerDependants?: boolean | "force";
+  /**
+   * [false] Do nothing.
+   * [true] Validate dependants, if they're invalid and (touched or not empty), emit errors.
+   * [touched] Like true, but only emit error when touched.
+   * [notEmpty] Like true, but only emit error when not empty.
+   * Default to true
+   */
+  triggerDependants?: boolean | Array<"touched" | "notEmpty">;
 };
 
 type SetValue<TFormValues extends FormValues> = <TPath extends Path<TFormValues> = Path<TFormValues>>(
@@ -44,8 +62,14 @@ type SetValue<TFormValues extends FormValues> = <TPath extends Path<TFormValues>
   options?: SetValueOptions
 ) => void;
 
+type ValidateOptions = {
+  /** Validate but not emit errors. Default to false */
+  hideErrors?: boolean;
+};
+
 type Validate<TFormValues extends FormValues, TPath extends Path<TFormValues> = Path<TFormValues>> = (
-  path: TPath
+  path: TPath,
+  options?: ValidateOptions
 ) => string[] | boolean;
 
 export type InternalFormCenter<TFormValues extends FormValues = FormValues> = {
@@ -53,9 +77,10 @@ export type InternalFormCenter<TFormValues extends FormValues = FormValues> = {
   getFieldState: GetFieldState<TFormValues>;
   setValue: SetValue<TFormValues>;
   validate: Validate<TFormValues>;
+  resetValues: () => void;
 };
 
 export type FormCenter<TFormValues extends FormValues = FormValues> = Pick<
   InternalFormCenter<TFormValues>,
-  "getValue" | "setValue" | "validate" | "getFieldState"
+  "getValue" | "setValue" | "validate" | "getFieldState" | "resetValues"
 >;

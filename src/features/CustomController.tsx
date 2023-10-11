@@ -1,16 +1,19 @@
+import { InputNumber } from ".";
 import { MyFormData } from "./types";
 
+type ValueType = MyFormData["grand"]["parent"];
+
 type CustomControllerProps = {
-  value?: MyFormData["object"];
-  onChange?: (object: MyFormData["object"]) => void;
+  value?: ValueType;
+  onChange?: (object: ValueType) => void;
 };
 export function CustomController({ value, onChange }: CustomControllerProps) {
   return (
-    <input
-      value={value?.key}
+    <InputNumber
+      value={value?.child}
       onChange={(e) => {
         onChange?.({
-          key: e.target.value,
+          child: e,
         });
       }}
     />

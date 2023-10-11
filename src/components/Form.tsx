@@ -1,6 +1,6 @@
 import { FormEvent } from "react";
 import { FormValues } from "../types";
-import { useForm } from "../hooks";
+import { useForm, useFormState } from "../hooks";
 import { FormCenter } from "../form-center";
 import { FormCenterProvider } from "./FormCenterProvider";
 
@@ -17,6 +17,7 @@ export function Form<TFormValues extends FormValues = FormValues>({
   ...formProps
 }: FormProps<TFormValues>) {
   const formCenter = useForm<TFormValues>({ form });
+  const fillNo = useFormState("fillNo", formCenter);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,7 +25,7 @@ export function Form<TFormValues extends FormValues = FormValues>({
   };
 
   return (
-    <FormCenterProvider formCenter={formCenter}>
+    <FormCenterProvider key={fillNo} formCenter={formCenter}>
       <form {...formProps} onSubmit={handleSubmit} />
     </FormCenterProvider>
   );

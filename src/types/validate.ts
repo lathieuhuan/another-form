@@ -19,10 +19,4 @@ export type ValidateRules<TFormValues extends FormValues> = {
   validate?: (value: unknown, values: TFormValues) => boolean;
 };
 
-// export type ValidateRule<TFormValues extends FormValues> = {
-//   required?: boolean | ((values: TFormValues) => boolean);
-//   validator?: (value: any, values: TFormValues) => boolean;
-//   message?: string;
-// };
-
 export type FormRules<TFormValues extends FormValues> = Partial<Record<Path<TFormValues>, ValidateRules<TFormValues>>>;

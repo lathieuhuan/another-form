@@ -16,9 +16,7 @@ export function useForm<TFormValues extends FormValues = FormValues>(args: UseFo
 
   useEffect(() => {
     const form = formCenter.current as FormCenterService<TFormValues>;
-
-    args.rules && form.updateFormRules(args.rules);
-    args.dependants && form.updateFormDependants(args.dependants);
+    form._construct(args);
   }, []);
 
   return formCenter.current;

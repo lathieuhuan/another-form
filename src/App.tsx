@@ -1,6 +1,6 @@
 import { Form, FormItem } from "./components";
 import { useForm, useFormState } from "./hooks";
-import { MyFormData, InputNumber, Input } from "./features";
+import { MyFormData, InputNumber, Input, CustomController } from "./features";
 
 type FieldProps = {
   label: string;
@@ -13,16 +13,7 @@ const Field = (props: FieldProps) => {
   return (
     <div className="col">
       <label>
-        {props.isRequired ? (
-          <span
-            style={{
-              marginLeft: 2,
-              color: "red",
-            }}
-          >
-            *
-          </span>
-        ) : null}
+        {props.isRequired ? <span style={{ color: "red" }}>* </span> : null}
         {props.label}
       </label>
       {props.description ? <span>{props.description}</span> : null}
@@ -39,40 +30,36 @@ const Field = (props: FieldProps) => {
 function App() {
   const form = useForm<MyFormData>({
     defaultValues: {
-      quantity: 10,
-      // primitive: "",
-      // nested: {
-      //   value: "",
-      // },
-      // object: {
-      //   key: "",
-      // },
-    },
-    dependants: {
-      quantity: ["required3", "required4"],
-    },
-    rules: {
-      // quantity: {
-      //   required: true,
-      // },
-      required1: {
-        required: true,
-      },
-      required2: {
-        required: {
-          value: true,
-          message: "This is required",
+      grand: {
+        parent: {
+          child: 60,
         },
       },
-      required3: {
-        required: ({ quantity }) => quantity < 50,
+    },
+    dependants: {
+      "grand.parent": ["required1"],
+    },
+    rules: {
+      required1: {
+        required: true,
+        // required: ({ grand }) => {
+        //   console.log("run required");
+        //   const value = grand?.parent?.child;
+        //   return {
+        //     value: value !== undefined && value > 50,
+        //     message: `This is dynamic required when quantity (${value}) > 50`,
+        //   };
+        // },
       },
-      required4: {
-        required: ({ quantity }) => ({
-          value: quantity > 50,
-          message: `This is dynamic required when quantity (${quantity}) > 50`,
-        }),
-      },
+      // required1: {
+      //   required: true,
+      // },
+      // required2: {
+      //   required: {
+      //     value: true,
+      //     message: "This is required",
+      //   },
+      // },
     },
   });
 
@@ -81,8 +68,10 @@ function App() {
   console.log("app render");
 
   const handleClick = () => {
-    form.setValue("quantity", 160, { triggerDependants: "force" });
-    // form.setValue("object", { key: "DEV" });
+    // form.setValue("grand.parent.child", 40);
+    // form.setValue("grand.parent", { child: 40 });
+    // form.setValue("grand", { parent: { child: 40 } });
+    form.validate("required1");
   };
 
   return (
@@ -93,11 +82,21 @@ function App() {
         console.log(values);
       }}
     >
-      <FormItem form={form} name="quantity">
+      <FormItem form={form} name="grand.parent.child2">
         {(control, state) => {
           return (
-            <Field label="Quantity" {...state}>
+            <Field label="Deep nested" {...state}>
               <InputNumber {...control} />
+            </Field>
+          );
+        }}
+      </FormItem>
+
+      <FormItem form={form} name="grand.parent">
+        {(control, state) => {
+          return (
+            <Field label="Deep nested" {...state}>
+              <CustomController {...control} />
             </Field>
           );
         }}
@@ -112,35 +111,11 @@ function App() {
           );
         }}
       </FormItem>
-      <FormItem form={form} name="required2">
-        {(control, state) => {
-          return (
-            <Field label="Required 2" {...state}>
-              <Input {...control} />
-            </Field>
-          );
-        }}
-      </FormItem>
-      <FormItem form={form} name="required3">
-        {(control, state) => {
-          return (
-            <Field label="Required 3" description="This is required when quantity < 50" {...state}>
-              <Input {...control} />
-            </Field>
-          );
-        }}
-      </FormItem>
-      <FormItem form={form} name="required4">
-        {(control, state) => {
-          return (
-            <Field label="Required 4" {...state}>
-              <Input {...control} />
-            </Field>
-          );
-        }}
-      </FormItem>
 
       <div className="row">
+        <button type="button" onClick={form.resetValues}>
+          Reset
+        </button>
         <button type="button" onClick={handleClick}>
           Click
         </button>

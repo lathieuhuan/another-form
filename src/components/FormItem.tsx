@@ -37,7 +37,7 @@ export function FormItem<
   TPath extends Path<TFormValues> = Path<TFormValues>
 >({ form, name, children }: FormItemProps<TFormValues, TPath>) {
   const formCenter = useFormCenter(form) as FormCenterService<TFormValues>;
-  const [fieldState, setFieldState] = useState(() => sanitizeState(formCenter._getInitialFieldState(name)));
+  const [{ value, ...state }, setFieldState] = useState(() => sanitizeState(formCenter._getInitialFieldState(name)));
 
   useEffect(() => {
     return formCenter._registerField(name, (newState) => {
@@ -56,7 +56,7 @@ export function FormItem<
     }
 
     formCenter.setFieldTouched(name, true);
-    formCenter.setValue(name, newValue === "" ? undefined : newValue, { triggerDependants: true });
+    formCenter.setValue(name, newValue === "" ? undefined : newValue);
     formCenter.validate(name);
   };
 
@@ -66,14 +66,10 @@ export function FormItem<
 
   return children(
     {
-      value: fieldState.value,
+      value,
       onChange: handleChange,
       onBlur: handleBlur,
     },
-    {
-      errors: fieldState.errors,
-      isDisabled: fieldState.isDisabled,
-      isRequired: fieldState.isRequired,
-    }
+    state
   );
 }
