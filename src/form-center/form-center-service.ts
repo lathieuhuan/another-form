@@ -8,15 +8,20 @@ import {
   Path,
   TouchedFields,
   ValidFields,
-} from "../types";
-import { FieldWatcher, FormCenterConstructOptions, InternalFormCenter, ValueWatcher } from "./types";
-import get from "../utils/get";
-import set from "../utils/set";
-import cloneObject from "../utils/cloneObject";
-import isNullOrUndefined from "../utils/isNullOrUndefined";
-import isUndefined from "../utils/isUndefined";
-import isPathMatched from "../utils/isPathMatched";
-import { isFieldRequired, validateField } from "./validate-field";
+} from '../types';
+import {
+  FieldWatcher,
+  FormCenterConstructOptions,
+  InternalFormCenter,
+  ValueWatcher,
+} from './types';
+import get from '../utils/get';
+import set from '../utils/set';
+import cloneObject from '../utils/cloneObject';
+import isNullOrUndefined from '../utils/isNullOrUndefined';
+import isUndefined from '../utils/isUndefined';
+import isPathMatched from '../utils/isPathMatched';
+import { isFieldRequired, validateField } from './validate-field';
 
 export class FormCenterService<TFormValues extends FormValues = FormValues> {
   config: FormConfig = {
@@ -53,7 +58,13 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
   // ========== FORM ==========
 
   _construct = (args: FormCenterConstructOptions<TFormValues> = {}) => {
-    const { config = {}, initialState = {}, defaultValues = {}, dependants = {}, rules = {} } = cloneObject(args);
+    const {
+      config = {},
+      initialState = {},
+      defaultValues = {},
+      dependants = {},
+      rules = {},
+    } = cloneObject(args);
 
     this.config = Object.assign(this.config, config);
     this.state = Object.assign(this.state, initialState);
@@ -75,7 +86,9 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
   };
 
   _updateFormState = (newState: Partial<FormState>) => {
-    if (Object.entries(newState).some(([key, value]) => value !== this.state[key as keyof FormState])) {
+    if (
+      Object.entries(newState).some(([key, value]) => value !== this.state[key as keyof FormState])
+    ) {
       this.state = {
         ...this.state,
         ...newState,
@@ -101,7 +114,7 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
 
   // ========== FIELD ==========
 
-  getFieldState: InternalFormCenter<TFormValues>["getFieldState"] = (path) => {
+  getFieldState: InternalFormCenter<TFormValues>['getFieldState'] = (path) => {
     const value = get(this.values, path);
     const isRequired = isFieldRequired(this.rules[path]?.required, this.values) !== false;
 
@@ -117,14 +130,15 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
 
   _getInitialFieldState: typeof this.getFieldState = (path) => {
     const initialFieldState = this.getFieldState(path);
-    const initialValid = !initialFieldState.isRequired || !isNullOrUndefined(initialFieldState.value);
+    const initialValid =
+      !initialFieldState.isRequired || !isNullOrUndefined(initialFieldState.value);
     this._setFieldValid(path, initialValid);
     return initialFieldState;
   };
 
   _registerField = <TPath extends Path<TFormValues>>(
     path: TPath,
-    watcher: FieldWatcher<TFormValues, TPath>
+    watcher: FieldWatcher<TFormValues, TPath>,
   ): (() => void) => {
     const fieldWatchers = this.fieldWatchers.get(path);
 
@@ -141,11 +155,11 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
     };
   };
 
-  getValue: InternalFormCenter<TFormValues>["getValue"] = (path?: Path<TFormValues>) => {
+  getValue: InternalFormCenter<TFormValues>['getValue'] = (path?: Path<TFormValues>) => {
     return path ? get(this.values, path) : this.values;
   };
 
-  setValue: InternalFormCenter<TFormValues>["setValue"] = (path, value, options = {}) => {
+  setValue: InternalFormCenter<TFormValues>['setValue'] = (path, value, options = {}) => {
     set(this.values, path, value);
 
     /**
@@ -163,7 +177,7 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
         watchers.forEach((watcher) =>
           watcher({
             value: get(this.values, key),
-          })
+          }),
         );
       }
     }
@@ -182,8 +196,8 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
               shouldEmitErrors = dependantIsTouched || dependantIsNotEmpty;
             } else {
               shouldEmitErrors =
-                (dependantIsTouched && triggerDependants.includes("touched")) ||
-                (dependantIsNotEmpty && triggerDependants.includes("notEmpty"));
+                (dependantIsTouched && triggerDependants.includes('touched')) ||
+                (dependantIsNotEmpty && triggerDependants.includes('notEmpty'));
             }
             this.validate(dependency, { hideErrors: !shouldEmitErrors });
           });
@@ -192,9 +206,11 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
     }
   };
 
-  validate: InternalFormCenter<TFormValues>["validate"] = (path, options = {}) => {
+  validate: InternalFormCenter<TFormValues>['validate'] = (path, options = {}) => {
     const rules = this.rules[path];
-    const validateResult = rules ? validateField(rules, get(this.values, path), this.values) : undefined;
+    const validateResult = rules
+      ? validateField(rules, get(this.values, path), this.values)
+      : undefined;
 
     this.errors[path] = validateResult?.errors.length ? validateResult.errors : undefined;
     const errors = this.errors[path];
@@ -203,7 +219,7 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
       watcher({
         errors: options.hideErrors ? [] : errors,
         isRequired: validateResult?.isRequired === true,
-      })
+      }),
     );
     this._setFieldValid(path, isUndefined(errors));
 

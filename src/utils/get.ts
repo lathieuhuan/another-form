@@ -1,7 +1,7 @@
-import compact from "./compact";
-import isNullOrUndefined from "./isNullOrUndefined";
-import isObject from "./isObject";
-import isUndefined from "./isUndefined";
+import compact from './compact';
+import isNullOrUndefined from './isNullOrUndefined';
+import isObject from './isObject';
+import isUndefined from './isUndefined';
 
 export default <T>(obj: T, path?: string, defaultValue?: unknown): any => {
   if (!path || !isObject(obj)) {
@@ -11,7 +11,7 @@ export default <T>(obj: T, path?: string, defaultValue?: unknown): any => {
   // const result = compact(path.split(/[,[\].]+?/)).reduce(
   const result = compact(path.split(/[[\].]+/)).reduce(
     (result, key) => (isNullOrUndefined(result) ? result : result[key as keyof object]),
-    obj
+    obj,
   );
 
   return isUndefined(result) || result === obj

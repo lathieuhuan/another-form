@@ -1,7 +1,7 @@
-import { FormValues } from "../types";
-import isKey from "./isKey";
-import isObject from "./isObject";
-import stringToPath from "./stringToPath";
+import { FormValues } from '../types';
+import isKey from './isKey';
+import isObject from './isObject';
+import stringToPath from './stringToPath';
 
 export default function set(object: FormValues, path: string, value?: unknown) {
   let index = -1;
@@ -15,7 +15,12 @@ export default function set(object: FormValues, path: string, value?: unknown) {
 
     if (index !== lastIndex) {
       const objValue = object[key];
-      newValue = isObject(objValue) || Array.isArray(objValue) ? objValue : !isNaN(+tempPath[index + 1]) ? [] : {};
+      newValue =
+        isObject(objValue) || Array.isArray(objValue)
+          ? objValue
+          : !isNaN(+tempPath[index + 1])
+          ? []
+          : {};
     }
     object[key] = newValue;
     object = object[key];

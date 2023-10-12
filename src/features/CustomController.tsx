@@ -1,7 +1,7 @@
-import { InputNumber } from ".";
-import { MyFormData } from "./types";
+import { InputNumber } from '.';
+import { MyFormData } from './types';
 
-type ValueType = MyFormData["grand"]["parent"];
+type ValueType = MyFormData['grand']['parent'];
 
 type CustomControllerProps = {
   value?: ValueType;

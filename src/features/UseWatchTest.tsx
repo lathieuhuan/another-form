@@ -1,6 +1,6 @@
-import { useFormCenter, useWatch } from "../hooks";
-import { Path } from "../types";
-import { MyFormData } from "./types";
+import { useFormCenter, useWatch } from '../hooks';
+import { Path } from '../types';
+import { MyFormData } from './types';
 
 export function UseWatchTest({ path }: { path: Path<MyFormData> }) {
   const form = useFormCenter<MyFormData>();

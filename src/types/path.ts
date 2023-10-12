@@ -1,18 +1,22 @@
-import { BrowserNativeObject, IsAny, IsEqual, Primitive } from "./utils";
+import { BrowserNativeObject, IsAny, IsEqual, Primitive } from './utils';
 
-export type IsTuple<T extends ReadonlyArray<any>> = number extends T["length"] ? false : true;
+export type IsTuple<T extends ReadonlyArray<any>> = number extends T['length'] ? false : true;
 
 export type TupleKeys<T extends ReadonlyArray<any>> = Exclude<keyof T, keyof any[]>;
 
 type AnyIsEqual<T1, T2> = T1 extends T2 ? (IsEqual<T1, T2> extends true ? true : never) : never;
 
-type PathImpl<K extends string | number, V, TraversedTypes> = V extends Primitive | BrowserNativeObject
+type PathImpl<K extends string | number, V, TraversedTypes> = V extends
+  | Primitive
+  | BrowserNativeObject
   ? `${K}`
   : true extends AnyIsEqual<TraversedTypes, V>
   ? `${K}`
   : `${K}` | `${K}.${PathInternal<V, TraversedTypes | V>}`;
 
-type ArrayPathImpl<K extends string | number, V, TraversedTypes> = V extends Primitive | BrowserNativeObject
+type ArrayPathImpl<K extends string | number, V, TraversedTypes> = V extends
+  | Primitive
+  | BrowserNativeObject
   ? IsAny<V> extends true
     ? string
     : never

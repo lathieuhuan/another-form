@@ -1,12 +1,12 @@
-import { FormValues, ValidateRule, ValidateRules } from "../types";
-import isNullOrUndefined from "../utils/isNullOrUndefined";
+import { FormValues, ValidateRule, ValidateRules } from '../types';
+import isNullOrUndefined from '../utils/isNullOrUndefined';
 
 /**
  * @returns string (error) or true if required, false otherwise
  */
 export const isFieldRequired = <TFormValues extends FormValues>(
   requiredRule: ValidateRule<TFormValues, boolean> | undefined,
-  formValues: TFormValues
+  formValues: TFormValues,
 ): boolean | string => {
   if (requiredRule === undefined) return false;
 
@@ -14,17 +14,17 @@ export const isFieldRequired = <TFormValues extends FormValues>(
   let errorMsg;
 
   switch (typeof requiredRule) {
-    case "boolean":
+    case 'boolean':
       isRequired = requiredRule;
       break;
-    case "object":
+    case 'object':
       isRequired = requiredRule.value;
       errorMsg = requiredRule.message;
       break;
     default:
       const result = requiredRule(formValues);
 
-      if (typeof result === "boolean") {
+      if (typeof result === 'boolean') {
         isRequired = result;
       } else {
         isRequired = result.value;
@@ -37,14 +37,14 @@ export const isFieldRequired = <TFormValues extends FormValues>(
 export const validateField = <TFormValues extends FormValues>(
   rules: ValidateRules<TFormValues>,
   fieldValue: any,
-  formValues: TFormValues
+  formValues: TFormValues,
 ) => {
   const errors: string[] = [];
   const { required } = rules;
   const isRequired = isFieldRequired(required, formValues);
 
   if (isRequired && isNullOrUndefined(fieldValue)) {
-    errors.push(isRequired === true ? "Default required message" : isRequired);
+    errors.push(isRequired === true ? 'Default required message' : isRequired);
   }
 
   return {

@@ -1,6 +1,6 @@
-import { Form, FormItem } from "./components";
-import { useForm, useFormCenter, useFormState, useWatch } from "./hooks";
-import { MyFormData, InputNumber, Input, CustomController } from "./features";
+import { Form, FormItem } from './components';
+import { useForm, useFormCenter, useFormState, useWatch } from './hooks';
+import { MyFormData, InputNumber, Input, CustomController } from './features';
 
 type FieldProps = {
   label: string;
@@ -13,24 +13,20 @@ const Field = (props: FieldProps) => {
   return (
     <div className="col">
       <label>
-        {props.isRequired ? <span style={{ color: "red" }}>* </span> : null}
+        {props.isRequired ? <span style={{ color: 'red' }}>* </span> : null}
         {props.label}
       </label>
       {props.description ? <span>{props.description}</span> : null}
       {props.children}
-      <div>
-        {props.errors?.map((error, i) => (
-          <p key={i}>{error}</p>
-        ))}
-      </div>
+      <div>{props.errors?.map((error, i) => <p key={i}>{error}</p>)}</div>
     </div>
   );
 };
 
 const Watch = () => {
   const form = useFormCenter<MyFormData>();
-  const a = useWatch("grand.parent", form);
-  console.log("Watch", a);
+  const a = useWatch('grand.parent', form);
+  console.log('Watch', a);
 
   return <div />;
 };
@@ -51,7 +47,7 @@ function App() {
     //   "grand.parent": ["required1"],
     // },
     rules: {
-      "grand.parent": {
+      'grand.parent': {
         required: true,
       },
       // required1: {
@@ -75,9 +71,9 @@ function App() {
     },
   });
 
-  const state = useFormState("isValid", form);
+  const state = useFormState('isValid', form);
 
-  console.log("app render");
+  console.log('app render');
 
   const handleClick = () => {
     // form.setValue("grand.parent.child", 40);

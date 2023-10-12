@@ -1,2 +1,2 @@
-export * from "./form-center-service";
-export type { FormCenter, FieldState } from "./types";
+export * from './form-center-service';
+export type { FormCenter, FieldState } from './types';

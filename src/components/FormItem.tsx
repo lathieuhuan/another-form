@@ -1,11 +1,11 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { FieldState, FormCenter, FormCenterService } from "../form-center";
-import { useFormCenter } from "../hooks";
-import { FormValues, Path, PathValue } from "../types";
+import { ChangeEvent, useEffect, useState } from 'react';
+import { FieldState, FormCenter, FormCenterService } from '../form-center';
+import { useFormCenter } from '../hooks';
+import { FormValues, Path, PathValue } from '../types';
 
 type LocalFieldState<TFormValues extends FormValues, TPath extends Path<TFormValues>> = Pick<
   FieldState<TFormValues, TPath>,
-  "value" | "errors" | "isRequired" | "isDisabled"
+  'value' | 'errors' | 'isRequired' | 'isDisabled'
 >;
 
 type FormItemProps<TFormValues extends FormValues, TPath extends Path<TFormValues>> = {
@@ -17,12 +17,12 @@ type FormItemProps<TFormValues extends FormValues, TPath extends Path<TFormValue
       onChange: (...e: any[]) => void;
       onBlur: () => void;
     },
-    state: Omit<LocalFieldState<TFormValues, TPath>, "value">
+    state: Omit<LocalFieldState<TFormValues, TPath>, 'value'>,
   ) => React.ReactElement | null;
 };
 
 const sanitizeState = <TFormValues extends FormValues, TPath extends Path<TFormValues>>(
-  state: LocalFieldState<TFormValues, TPath>
+  state: LocalFieldState<TFormValues, TPath>,
 ): LocalFieldState<TFormValues, TPath> => {
   return {
     value: state.value,
@@ -34,10 +34,12 @@ const sanitizeState = <TFormValues extends FormValues, TPath extends Path<TFormV
 
 export function FormItem<
   TFormValues extends FormValues = FormValues,
-  TPath extends Path<TFormValues> = Path<TFormValues>
+  TPath extends Path<TFormValues> = Path<TFormValues>,
 >({ form, name, children }: FormItemProps<TFormValues, TPath>) {
   const formCenter = useFormCenter(form) as FormCenterService<TFormValues>;
-  const [{ value, ...state }, setFieldState] = useState(() => sanitizeState(formCenter._getInitialFieldState(name)));
+  const [{ value, ...state }, setFieldState] = useState(() =>
+    sanitizeState(formCenter._getInitialFieldState(name)),
+  );
 
   useEffect(() => {
     return formCenter._registerField(name, (newState) => {
@@ -49,14 +51,14 @@ export function FormItem<
     const value = e[0];
     let newValue;
 
-    if (typeof value === "object" && "target" in value) {
+    if (typeof value === 'object' && 'target' in value) {
       newValue = (value as ChangeEvent<HTMLInputElement>)?.target?.value;
     } else {
       newValue = value;
     }
 
     formCenter.setFieldTouched(name, true);
-    formCenter.setValue(name, newValue === "" ? undefined : newValue);
+    formCenter.setValue(name, newValue === '' ? undefined : newValue);
     formCenter.validate(name);
   };
 
@@ -70,6 +72,6 @@ export function FormItem<
       onChange: handleChange,
       onBlur: handleBlur,
     },
-    state
+    state,
   );
 }

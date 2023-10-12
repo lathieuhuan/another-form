@@ -1,5 +1,5 @@
-import { FormValues } from "./form";
-import { Path } from "./path";
+import { FormValues } from './form';
+import { Path } from './path';
 
 export type FieldError = string;
 
@@ -19,4 +19,6 @@ export type ValidateRules<TFormValues extends FormValues> = {
   validate?: (value: unknown, values: TFormValues) => boolean;
 };
 
-export type FormRules<TFormValues extends FormValues> = Partial<Record<Path<TFormValues>, ValidateRules<TFormValues>>>;
+export type FormRules<TFormValues extends FormValues> = Partial<
+  Record<Path<TFormValues>, ValidateRules<TFormValues>>
+>;

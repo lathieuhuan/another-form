@@ -10,4 +10,6 @@ export type IsEqual<T1, T2> = T1 extends T2
     : false
   : false;
 
-export type DeepPartial<T> = T extends BrowserNativeObject ? T : { [K in keyof T]?: DeepPartial<T[K]> };
+export type DeepPartial<T> = T extends BrowserNativeObject
+  ? T
+  : { [K in keyof T]?: DeepPartial<T[K]> };

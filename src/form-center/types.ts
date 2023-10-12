@@ -8,7 +8,7 @@ import {
   FormDependants,
   FormState,
   FormConfig,
-} from "../types";
+} from '../types';
 
 export type FormCenterConstructOptions<TFormValues extends FormValues> = {
   config?: FormConfig;
@@ -19,8 +19,10 @@ export type FormCenterConstructOptions<TFormValues extends FormValues> = {
   dependants?: FormDependants<TFormValues>;
 };
 
-export type ValueWatcher<TFormValues extends FormValues> = <TPath extends Path<TFormValues> = Path<TFormValues>>(
-  value: PathValue<TFormValues, TPath>
+export type ValueWatcher<TFormValues extends FormValues> = <
+  TPath extends Path<TFormValues> = Path<TFormValues>,
+>(
+  value: PathValue<TFormValues, TPath>,
 ) => void;
 
 export type FieldState<TFormValues extends FormValues, TPath extends Path<TFormValues>> = {
@@ -32,9 +34,10 @@ export type FieldState<TFormValues extends FormValues, TPath extends Path<TFormV
   isRequired: boolean;
 };
 
-export type FieldWatcher<TFormValues extends FormValues, TPath extends Path<TFormValues> = Path<TFormValues>> = (
-  state: Partial<FieldState<TFormValues, TPath>>
-) => void;
+export type FieldWatcher<
+  TFormValues extends FormValues,
+  TPath extends Path<TFormValues> = Path<TFormValues>,
+> = (state: Partial<FieldState<TFormValues, TPath>>) => void;
 
 type GetValue<TFormValues extends FormValues = FormValues> = {
   <TPath extends Path<TFormValues>>(path: TPath): PathValue<TFormValues, TPath>;
@@ -42,7 +45,7 @@ type GetValue<TFormValues extends FormValues = FormValues> = {
 };
 
 type GetFieldState<TFormValues extends FormValues = FormValues> = <TPath extends Path<TFormValues>>(
-  path: TPath
+  path: TPath,
 ) => FieldState<TFormValues, TPath>;
 
 type SetValueOptions = {
@@ -53,13 +56,15 @@ type SetValueOptions = {
    * [notEmpty] Like true, but only emit error when not empty.
    * Default to true
    */
-  triggerDependants?: boolean | Array<"touched" | "notEmpty">;
+  triggerDependants?: boolean | Array<'touched' | 'notEmpty'>;
 };
 
-type SetValue<TFormValues extends FormValues> = <TPath extends Path<TFormValues> = Path<TFormValues>>(
+type SetValue<TFormValues extends FormValues> = <
+  TPath extends Path<TFormValues> = Path<TFormValues>,
+>(
   name: TPath,
   value: PathValue<TFormValues, TPath>,
-  options?: SetValueOptions
+  options?: SetValueOptions,
 ) => void;
 
 type ValidateOptions = {
@@ -67,10 +72,10 @@ type ValidateOptions = {
   hideErrors?: boolean;
 };
 
-type Validate<TFormValues extends FormValues, TPath extends Path<TFormValues> = Path<TFormValues>> = (
-  path: TPath,
-  options?: ValidateOptions
-) => string[] | boolean;
+type Validate<
+  TFormValues extends FormValues,
+  TPath extends Path<TFormValues> = Path<TFormValues>,
+> = (path: TPath, options?: ValidateOptions) => string[] | boolean;
 
 export type InternalFormCenter<TFormValues extends FormValues = FormValues> = {
   getValue: GetValue<TFormValues>;
@@ -82,5 +87,5 @@ export type InternalFormCenter<TFormValues extends FormValues = FormValues> = {
 
 export type FormCenter<TFormValues extends FormValues = FormValues> = Pick<
   InternalFormCenter<TFormValues>,
-  "getValue" | "setValue" | "validate" | "getFieldState" | "resetValues"
+  'getValue' | 'setValue' | 'validate' | 'getFieldState' | 'resetValues'
 >;
