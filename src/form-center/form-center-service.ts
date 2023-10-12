@@ -20,7 +20,7 @@ import set from '../utils/set';
 import cloneObject from '../utils/cloneObject';
 import isNullOrUndefined from '../utils/isNullOrUndefined';
 import isUndefined from '../utils/isUndefined';
-import isPathMatched from '../utils/isPathMatched';
+import arePathsMatched from '../utils/arePathsMatched';
 import { isFieldRequired, validateField } from './validate-field';
 
 export class FormCenterService<TFormValues extends FormValues = FormValues> {
@@ -168,12 +168,12 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
      * E.g-2. set 'a.b' = 1 ==> also notify 'a' and 'a.b'
      */
     for (const [key, watchers] of this.valueWatchers.entries()) {
-      if (isPathMatched(path, key)) {
+      if (arePathsMatched(path, key)) {
         watchers.forEach((watcher) => watcher(get(this.values, key)));
       }
     }
     for (const [key, watchers] of this.fieldWatchers.entries()) {
-      if (isPathMatched(path, key)) {
+      if (arePathsMatched(path, key)) {
         watchers.forEach((watcher) =>
           watcher({
             value: get(this.values, key),
@@ -186,7 +186,7 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
 
     if (triggerDependants) {
       for (const key in this.dependants) {
-        if (isPathMatched(path, key)) {
+        if (arePathsMatched(path, key)) {
           this.dependants[key as keyof typeof this.dependants]?.forEach((dependency) => {
             const dependantIsTouched = this.touchedFields[dependency];
             const dependantIsNotEmpty = !isNullOrUndefined(get(this.values, dependency));
