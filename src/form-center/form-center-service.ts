@@ -75,18 +75,18 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
   };
 
   _updateFormState = (newState: Partial<FormState>) => {
-    this.state = {
-      ...this.state,
-      ...newState,
-    };
-    this.formStateWatchers.forEach((watcher) => watcher(this.state));
+    if (Object.entries(newState).some(([key, value]) => value !== this.state[key as keyof FormState])) {
+      this.state = {
+        ...this.state,
+        ...newState,
+      };
+      this.formStateWatchers.forEach((watcher) => watcher(this.state));
+    }
   };
 
   _checkFormValid = () => {
-    const isValid = Object.values(this.validFields).every(Boolean);
-
     this._updateFormState({
-      isValid,
+      isValid: Object.values(this.validFields).every(Boolean),
     });
   };
 

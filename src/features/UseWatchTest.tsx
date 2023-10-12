@@ -4,7 +4,7 @@ import { MyFormData } from "./types";
 
 export function UseWatchTest({ path }: { path: Path<MyFormData> }) {
   const form = useFormCenter<MyFormData>();
-  const value = useWatch(form, path);
+  const value = useWatch(path, form);
 
   return (
     <div>
