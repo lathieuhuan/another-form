@@ -16,10 +16,10 @@ export function useForm<TFormValues extends FormValues = FormValues>(
     formCenter.current = new FormCenterService<TFormValues>(args);
   }
 
-  useEffect(() => {
-    const form = formCenter.current as FormCenterService<TFormValues>;
-    form._construct(args);
-  }, []);
+  // useEffect(() => {
+  //   const form = formCenter.current as FormCenterService<TFormValues>;
+  //   form._construct(args);
+  // }, []);
 
   return formCenter.current;
 }

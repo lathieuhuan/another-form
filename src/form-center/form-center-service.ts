@@ -215,12 +215,12 @@ export class FormCenterService<TFormValues extends FormValues = FormValues> {
     this.errors[path] = validateResult?.errors.length ? validateResult.errors : undefined;
     const errors = this.errors[path];
 
-    this.fieldWatchers.get(path)?.forEach((watcher) =>
+    this.fieldWatchers.get(path)?.forEach((watcher) => {
       watcher({
         errors: options.hideErrors ? [] : errors,
         isRequired: validateResult?.isRequired === true,
-      }),
-    );
+      });
+    });
     this._setFieldValid(path, isUndefined(errors));
 
     return errors ?? true;

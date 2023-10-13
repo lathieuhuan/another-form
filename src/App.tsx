@@ -32,50 +32,61 @@ const Watch = () => {
 };
 
 function App() {
-  const form = useForm<MyFormData>({
+  const form = useForm<{ test: string }>({
+    defaultValues: {
+      test: '',
+    },
+    rules: {
+      test: {
+        required: true,
+      },
+    },
     // initialState: {
     //   isValid: true,
     // },
     // defaultValues: {
-    //   grand: {
-    //     parent: {
-    //       child: 60,
-    //     },
+    // grand: {
+    //   parent: {
+    //     child: 60,
     //   },
+    // },
+    //   required1: '',
     // },
     // dependants: {
     //   "grand.parent": ["required1"],
     // },
-    rules: {
-      'grand.parent': {
-        required: true,
-      },
-      // required1: {
-      //   required: true,
-      // required: ({ grand }) => {
-      //   return {
-      //     value: value !== undefined && value > 50,
-      //     message: `This is dynamic required when quantity (${value}) > 50`,
-      //   };
-      // },
-      // },
-      // required1: {
-      //   required: true,
-      // },
-      // required2: {
-      //   required: {
-      //     value: true,
-      //     message: "This is required",
-      //   },
-      // },
-    },
+    // rules: {
+    // 'grand.parent': {
+    //   required: true,
+    // },
+    // required1: {
+    //   required: true,
+    // required: ({ grand }) => {
+    //   return {
+    //     value: value !== undefined && value > 50,
+    //     message: `This is dynamic required when quantity (${value}) > 50`,
+    //   };
+    // },
+    // },
+    // required1: {
+    //   required: true,
+    // },
+    // required2: {
+    //   required: {
+    //     value: true,
+    //     message: "This is required",
+    //   },
+    // },
+    // },
   });
 
-  const state = useFormState('isValid', form);
+  // const state = useFormState('isValid', form);
+  const state = true;
 
   console.log('app render');
 
   const handleClick = () => {
+    form.validate('test');
     // form.setValue("grand.parent.child", 40);
     // form.setValue("grand.parent", { child: 40 });
     // form.setValue("grand", { parent: { child: 40 } });
@@ -89,6 +100,17 @@ function App() {
         console.log(values);
       }}
     >
+      <label htmlFor="test">Test</label>
+      <FormItem name="test">
+        {(control, state) => {
+          return (
+            <>
+              <input id="test" {...control} />
+              {state.errors ? <span role="alert">Error</span> : null}
+            </>
+          );
+        }}
+      </FormItem>
       {/* <FormItem form={form} name="grand.parent.child2">
         {(control, state) => {
           return (
@@ -98,9 +120,8 @@ function App() {
           );
         }}
       </FormItem> */}
-      <Watch />
 
-      <FormItem form={form} name="grand.parent">
+      {/* <FormItem form={form} name="grand.parent">
         {(control, state) => {
           return (
             <Field label="Deep nested" {...state}>
@@ -108,7 +129,7 @@ function App() {
             </Field>
           );
         }}
-      </FormItem>
+      </FormItem> */}
 
       {/* <FormItem form={form} name="required1">
         {(control, state) => {
@@ -121,15 +142,15 @@ function App() {
       </FormItem> */}
 
       <div className="row">
-        <button type="button" onClick={form.resetValues}>
+        {/* <button type="button" onClick={form.resetValues}>
           Reset
-        </button>
+        </button> */}
         <button type="button" onClick={handleClick}>
           Click
         </button>
-        <button type="submit" disabled={!state}>
+        {/* <button type="submit" disabled={!state}>
           Submit
-        </button>
+        </button> */}
       </div>
     </Form>
   );

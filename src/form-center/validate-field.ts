@@ -43,7 +43,7 @@ export const validateField = <TFormValues extends FormValues>(
   const { required } = rules;
   const isRequired = isFieldRequired(required, formValues);
 
-  if (isRequired && isNullOrUndefined(fieldValue)) {
+  if (isRequired && ['', null, undefined].includes(fieldValue)) {
     errors.push(isRequired === true ? 'Default required message' : isRequired);
   }
 

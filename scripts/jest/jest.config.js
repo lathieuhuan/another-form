@@ -11,13 +11,12 @@ const web = {
   ...jestDefaultConfig,
   displayName: 'web',
   setupFilesAfterEnv: ['<rootDir>/scripts/jest/jest.setup.ts'],
-  testMatch: [
-    '**/__tests__/**/*.(spec|test).ts?(x)',
-    '**/__tests__/*.(spec|test).ts?(x)'
-  ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '<rootDir>/coverage',
   testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.(ts|js|tsx|jsx)$': '@swc/jest',
+  },
 };
 
 const getProjects = () => {

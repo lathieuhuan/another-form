@@ -8,7 +8,10 @@ type LocalFieldState<TFormValues extends FormValues, TPath extends Path<TFormVal
   'value' | 'errors' | 'isRequired' | 'isDisabled'
 >;
 
-type FormItemProps<TFormValues extends FormValues, TPath extends Path<TFormValues>> = {
+export type FormItemProps<
+  TFormValues extends FormValues,
+  TPath extends Path<TFormValues> = Path<TFormValues>,
+> = {
   form?: FormCenter<TFormValues>;
   name: TPath;
   children: (
