@@ -1,5 +1,4 @@
 import { FormValues, ValidateRule, ValidateRules } from '../types';
-import isNullOrUndefined from '../utils/isNullOrUndefined';
 
 /**
  * @returns string (error) or true if required, false otherwise

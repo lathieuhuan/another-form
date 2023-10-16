@@ -1,4 +1,4 @@
-import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
+import { act, render, renderHook, screen } from '@testing-library/react';
 import { useForm } from '../hooks';
 import { Form, FormItem } from '../components';
 import { FormCenter } from '../form-center';
