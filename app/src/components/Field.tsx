@@ -7,14 +7,18 @@ type FieldProps = {
 };
 export const Field = (props: FieldProps) => {
   return (
-    <div className="col">
-      <label>
-        {props.isRequired ? <span style={{ color: 'red' }}>* </span> : null}
+    <div className="flex flex-col space-y-1">
+      <label className="font-medium text-light-1">
+        {props.isRequired ? <span className="text-red-600">* </span> : null}
         {props.label}
       </label>
       {props.description ? <span>{props.description}</span> : null}
       {props.children}
-      <div>{props.errors?.map((error, i) => <p key={i}>{error}</p>)}</div>
+      {props.errors?.length ? (
+        <div className="text-red-600">
+          {props.errors?.map((error, i) => <p key={i}>{error}</p>)}
+        </div>
+      ) : null}
     </div>
   );
 };

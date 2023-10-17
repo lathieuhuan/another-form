@@ -1,5 +1,5 @@
 {
-  "name": "another-form-test-app",
+  "name": "another-form-testing-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,7 +13,8 @@
     "another-form": "link:..",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-router-dom": "6.16.0"
+    "react-router-dom": "6.16.0",
+    "clsx": "2.0.0"
   },
   "devDependencies": {
     "@types/react": "18.2.15",

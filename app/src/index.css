@@ -19,29 +19,22 @@
   box-sizing: border-box;
 }
 
-form {
-  padding: 0.5rem 1rem;
+body {
+  @apply min-h-screen p-4 bg-dark-2 text-light-1;
 }
 
-label {
-  font-weight: 600;
+#root {
+  @apply w-full flex flex-col items-center;
+}
+
+form {
+  @apply px-6 py-4 bg-dark-1 border border-dark-3 rounded-lg w-full max-w-xl;
 }
 
 input,
+select,
 button {
   font-size: inherit;
-  padding: 0.25em 0.5em;
-  border-radius: 0.25rem;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.col {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  border: none;
+  outline: none;
 }
