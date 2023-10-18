@@ -17,7 +17,4 @@ export default defineConfig({
       external: ['react', 'react/jsx-runtime'],
     },
   },
-  server: {
-    port: 2023,
-  },
 });

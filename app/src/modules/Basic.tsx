@@ -1,13 +1,15 @@
 import { Form, FormItem, useForm } from 'another-form';
 import { Field, Input, InputNumber, Select, Radio, Checkbox, Footer } from '../components';
+import { useState } from 'react';
 
 let count = 0;
 
 const Basic = () => {
   const form = useForm();
+  const [data, setData] = useState<any>();
 
   const handleSubmit = (values: any) => {
-    console.log(values);
+    setData(values);
   };
 
   count++;
@@ -82,6 +84,8 @@ const Basic = () => {
 
         <Footer renderTimes={count} />
       </Form>
+
+      <pre>{JSON.stringify(data)}</pre>
     </>
   );
 };

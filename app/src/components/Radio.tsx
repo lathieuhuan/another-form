@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
-type RadioValue = string | number | boolean | undefined;
+type RadioValue = string | number | boolean;
 
 type RadioContext = {
-  value: RadioValue;
+  name?: string;
+  value: RadioValue | undefined;
   disabled: boolean;
   onChange: (value: RadioValue) => void;
 };
@@ -35,7 +36,14 @@ const Radio = (props: RadioProps) => {
         disabled ? 'cursor-not-allowed' : 'cursor-pointer',
       )}
     >
-      <input type="radio" checked={checked} disabled={disabled} onChange={onChange} />
+      <input
+        type="radio"
+        name={context?.name}
+        checked={checked}
+        value={`${props.value}`}
+        disabled={disabled}
+        onChange={onChange}
+      />
       <span>{props.children}</span>
     </label>
   );
@@ -43,6 +51,7 @@ const Radio = (props: RadioProps) => {
 
 type RadioGroupProps = {
   className?: string;
+  name?: string;
   children?: ReactNode;
   disabled?: boolean;
   value?: RadioValue;
@@ -51,13 +60,14 @@ type RadioGroupProps = {
 };
 const RadioGroup = ({
   className,
+  name,
   children,
   value,
   defaultValue,
   disabled = false,
   onChange,
 }: RadioGroupProps) => {
-  const [localValue, setLocalValue] = useState<RadioValue>(defaultValue);
+  const [localValue, setLocalValue] = useState<RadioValue | undefined>(defaultValue);
 
   useEffect(() => {
     if (value !== localValue) setLocalValue(value);
@@ -71,7 +81,7 @@ const RadioGroup = ({
   };
 
   return (
-    <Context.Provider value={{ value: finalValue, disabled, onChange: handleChange }}>
+    <Context.Provider value={{ name, value: finalValue, disabled, onChange: handleChange }}>
       <div className={className}>{children}</div>
     </Context.Provider>
   );

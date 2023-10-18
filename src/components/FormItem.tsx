@@ -16,6 +16,7 @@ export type FormItemProps<
   name: TPath;
   children: (
     control: {
+      name: string;
       value: PathValue<TFormValues, TPath>;
       onChange: (...e: any[]) => void;
       onBlur: () => void;
@@ -71,6 +72,7 @@ export function FormItem<
 
   return children(
     {
+      name,
       value,
       onChange: handleChange,
       onBlur: handleBlur,

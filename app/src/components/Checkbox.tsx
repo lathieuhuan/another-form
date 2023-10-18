@@ -12,6 +12,7 @@ import {
 type CheckboxValue = string | number | boolean | undefined;
 
 type CheckboxContext = {
+  name?: string;
   values: CheckboxValue[];
   disabled: boolean;
   onChange: (value: CheckboxValue) => void;
@@ -20,6 +21,7 @@ type CheckboxContext = {
 const Context = createContext<CheckboxContext | null>(null);
 
 type CheckboxProps = {
+  name?: string;
   /** This props is useless without Checkbox.Group, and required when used with Checkbox.Group */
   value?: CheckboxValue;
   /** This props is useless when used with Checkbox.Group */
@@ -63,7 +65,14 @@ const Checkbox = (props: CheckboxProps) => {
         disabled ? 'cursor-not-allowed' : 'cursor-pointer',
       )}
     >
-      <input ref={ref} type="checkbox" checked={checked} disabled={disabled} onChange={onChange} />
+      <input
+        ref={ref}
+        type="checkbox"
+        name={context?.name ?? props.name}
+        checked={checked}
+        disabled={disabled}
+        onChange={onChange}
+      />
       <span>{props.children}</span>
     </label>
   );
@@ -71,6 +80,7 @@ const Checkbox = (props: CheckboxProps) => {
 
 type CheckboxGroupProps = {
   className?: string;
+  name?: string;
   children?: ReactNode;
   disabled?: boolean;
   value?: CheckboxValue[];
@@ -79,6 +89,7 @@ type CheckboxGroupProps = {
 };
 export const CheckboxGroup = ({
   className,
+  name,
   children,
   value,
   defaultValue = [],
@@ -110,7 +121,7 @@ export const CheckboxGroup = ({
   };
 
   return (
-    <Context.Provider value={{ values: finalValue, disabled, onChange: handleChange }}>
+    <Context.Provider value={{ name, values: finalValue, disabled, onChange: handleChange }}>
       <div className={className}>{children}</div>
     </Context.Provider>
   );
