@@ -9,6 +9,7 @@ const Basic = () => {
   const [data, setData] = useState<any>();
 
   const handleSubmit = (values: any) => {
+    console.log(values);
     setData(values);
   };
 
@@ -68,7 +69,17 @@ const Basic = () => {
           }}
         </FormItem>
 
-        <FormItem name="checkbox">
+        <FormItem name="singleCheckbox" valueProps="checked">
+          {(control, state) => {
+            return (
+              <Field label="Single Checkbox" {...state}>
+                <Checkbox {...control}>Single checkbox</Checkbox>
+              </Field>
+            );
+          }}
+        </FormItem>
+
+        <FormItem name="groupCheckbox">
           {(control, state) => {
             return (
               <Field label="Checkbox Group" {...state}>
@@ -85,7 +96,7 @@ const Basic = () => {
         <Footer renderTimes={count} />
       </Form>
 
-      <pre>{JSON.stringify(data)}</pre>
+      <pre className="mt-4">{JSON.stringify(data, null, 2)}</pre>
     </>
   );
 };

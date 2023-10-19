@@ -6,7 +6,9 @@ describe('basic form', () => {
     cy.get('input[name="numberInput"]').type('123');
     // cy.get('select[name="select.nested"]').type('text input');
     cy.get('input[name="radio"]').check('radioB');
-    // cy.get('input[name="checkbox"]').check('checkboxC');
+    cy.get('input[name="singleCheckbox"]').check();
+    cy.get('input[name="groupCheckbox"]').check('checkboxA');
+    cy.get('input[name="groupCheckbox"]').check('checkboxC');
 
     cy.get('button[type="submit"]').click();
 
@@ -15,7 +17,8 @@ describe('basic form', () => {
         textInput: 'text input',
         numberInput: 123,
         radio: 'radioB',
-        // checkbox: ['checkboxC'],
+        singleCheckbox: true,
+        groupCheckbox: ['checkboxA', 'checkboxC'],
       }),
     );
   });

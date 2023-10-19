@@ -14,6 +14,7 @@ export type FormItemProps<
 > = {
   form?: FormCenter<TFormValues>;
   name: TPath;
+  valueProps?: string | ((value: any) => any);
   children: (
     control: {
       name: string;
@@ -39,7 +40,7 @@ const sanitizeState = <TFormValues extends FormValues, TPath extends Path<TFormV
 export function FormItem<
   TFormValues extends FormValues = FormValues,
   TPath extends Path<TFormValues> = Path<TFormValues>,
->({ form, name, children }: FormItemProps<TFormValues, TPath>) {
+>({ form, name, valueProps, children }: FormItemProps<TFormValues, TPath>) {
   const formCenter = useFormCenter(form) as FormCenterService<TFormValues>;
   const [{ value, ...state }, setFieldState] = useState(() =>
     sanitizeState(formCenter._getInitialFieldState(name)),
@@ -53,12 +54,24 @@ export function FormItem<
 
   const handleChange = (...e: any[]) => {
     const value = e[0];
-    let newValue;
+    let newValue: any;
 
-    if (typeof value === 'object' && 'target' in value) {
-      newValue = (value as ChangeEvent<HTMLInputElement>)?.target?.value;
+    if (typeof valueProps === 'function') {
+      newValue = valueProps(value);
     } else {
-      newValue = value;
+      let getValue: string | undefined;
+
+      if (typeof value === 'object' && 'target' in value) {
+        newValue = (value as ChangeEvent<HTMLInputElement>)?.target;
+        getValue = 'value';
+      } else {
+        newValue = value;
+      }
+      getValue = valueProps ?? getValue;
+
+      if (getValue && typeof newValue === 'object') {
+        newValue = newValue[getValue];
+      }
     }
 
     formCenter.setFieldTouched(name, true);

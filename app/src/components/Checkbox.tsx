@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 
-type CheckboxValue = string | number | boolean | undefined;
+type CheckboxValue = string | number | boolean;
 
 type CheckboxContext = {
   name?: string;
@@ -37,7 +37,10 @@ const Checkbox = (props: CheckboxProps) => {
   const ref = useRef<HTMLInputElement>(null);
   const [localChecked, setLocalChecked] = useState(props.defaultChecked ?? false);
 
-  const checked = context ? context.values.includes(props.value) : props.checked ?? localChecked;
+  const checked =
+    context && props.value !== undefined
+      ? context.values.includes(props.value)
+      : props.checked ?? localChecked;
   const disabled = context?.disabled ?? props.disabled;
 
   useEffect(() => {
@@ -47,15 +50,15 @@ const Checkbox = (props: CheckboxProps) => {
   }, [props.checked]);
 
   useEffect(() => {
-    if (props.indeterminate && ref.current) {
-      ref.current.indeterminate = true;
+    if (props.indeterminate !== undefined && ref.current) {
+      ref.current.indeterminate = props.indeterminate;
     }
   }, [props.indeterminate]);
 
   const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     props.onChange?.(e);
     setLocalChecked(e.target.checked);
-    context?.onChange(props.value);
+    if (props.value !== undefined) context?.onChange(props.value);
   };
 
   return (
@@ -69,6 +72,7 @@ const Checkbox = (props: CheckboxProps) => {
         ref={ref}
         type="checkbox"
         name={context?.name ?? props.name}
+        value={props.value === undefined ? undefined : `${props.value}`}
         checked={checked}
         disabled={disabled}
         onChange={onChange}
