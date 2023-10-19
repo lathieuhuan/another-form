@@ -1,7 +1,8 @@
 import { FormEvent } from 'react';
-import { FormValues } from '../types';
-import { useForm, useFormState } from '../hooks';
 import { FormCenter } from '../form-center';
+import { useForm, useFormState } from '../hooks';
+import { FormValues } from '../types';
+import cloneObject from '../utils/cloneObject';
 import { FormCenterProvider } from './FormCenterProvider';
 
 interface FormProps<TFormValues extends FormValues> {
@@ -21,7 +22,7 @@ export function Form<TFormValues extends FormValues = FormValues>({
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit?.(formCenter.getValue());
+    onSubmit?.(cloneObject(formCenter.getValue()));
   };
 
   return (

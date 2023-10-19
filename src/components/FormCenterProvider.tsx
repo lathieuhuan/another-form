@@ -1,6 +1,6 @@
 import { FormValues } from '../types';
 import { FormCenter } from '../form-center';
-import { FormCenterContext } from '../hooks';
+import { FormCenterContext } from '../hooks/useFormCenter';
 
 type FormCenterProviderProps<TFormValues extends FormValues> = {
   formCenter: FormCenter<TFormValues>;

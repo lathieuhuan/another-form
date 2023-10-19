@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { FormCenter, FormCenterService } from '../form-center';
 import { FormValues } from '../types';
 import { FormCenterConstructOptions } from '../form-center/types';
@@ -16,10 +16,10 @@ export function useForm<TFormValues extends FormValues = FormValues>(
     formCenter.current = new FormCenterService<TFormValues>(args);
   }
 
-  useEffect(() => {
-    const form = formCenter.current as FormCenterService<TFormValues>;
-    form._construct(args);
-  }, []);
+  // useEffect(() => {
+  //   const form = formCenter.current as FormCenterService<TFormValues>;
+  //   form._construct(args);
+  // }, []);
 
   return formCenter.current;
 }
